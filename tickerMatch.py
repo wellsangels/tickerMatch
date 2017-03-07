@@ -11,11 +11,15 @@ import distance
 
 # a dictionary for adding known abbreviations for big companies that are frequently used
 known_abbrevs = {"fannie mae":"FNMA","ibm":"IBM","freddie mac":"FMCC","ups":"UPS","aig":"AIG","adp":"ADP"}
+# a list of common words that are better off deleted
+delete_words = ['inc','corporation','corp','adr','ltd','sponsored','company','holdings','co','incorporated','partners','limited','sa','holding','properties','group','industries','technologies','plc','com','lp', 'class', 'a', 'b', 'c', 'the', 'of']
 
 #main function 
-def main(): 
-	lookup_file = "tickerMatchLookup.csv"
-	search_file = "tickerSearch.csv"
+def ticker_match(search_file = None, lookup_file = None): 
+	if lookup_file is None: 
+		lookup_file = "tickerMatchLookup.csv"
+	if search_file is None: 
+		search_file = "tickerSearch.csv"
 	lookup_dictionary = create_lookup_dictionary(lookup_file)
 	search_list = create_results_dictionary(search_file)
 	search_list = find_exact_matches(search_list, lookup_dictionary)
@@ -52,7 +56,6 @@ def find_common_words(lookup_dictionary):
 	most_common_words = counter.most_common(10)
 	#get the sum of all words
 	top_words = max(counter.values())
-	
 	#create a frequency dictionary
 	frequency_dic = dict()
 	#invert frequency so that the least common are more powerful
@@ -99,6 +102,11 @@ def distance_measure(search_string, key_string, frequency_dic):
 				total_score = total_score - frequency_dic[word]	
 			else: 
 				total_score = total_score - 1
+	# if total_score <= 0: 
+	# 	jaccard_score = distance.jaccard(search_string, key_string)
+	# 	if jaccard_score < 0.0001: 
+	# 		total_score = 0.001
+
 	return total_score
 
 # function for converting sloppy company names to cleaned names
@@ -110,7 +118,6 @@ def name_cleaner(unclean_company):
 	#transliterate any unicode to ascii
 	''.join(x for x in unicodedata.normalize('NFKD', unicode(clean_company)) if x in string.ascii_letters).lower()
 	#remove these common words from company names (also removes extra spaces)
-	delete_words = ['inc','corporation','corp','adr','ltd','sponsored','company','holdings','co','incorporated','partners','limited','sa','holding','properties','group','industries','technologies','plc','com','lp', 'class', 'a', 'b', 'c']
 	clean_company = [' '.join(w for w in clean_company.split() if w not in delete_words)]
 	return clean_company[0]
 
@@ -162,13 +169,6 @@ def find_fuzzy_matches(search_list, lookup_dictionary):
 	return search_list
 
 
-
-
-
-
-
-
-
 # call main function 
 if __name__=="__main__":
-	main()
+	ticker_match()
