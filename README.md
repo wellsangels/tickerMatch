@@ -3,7 +3,7 @@ This package matches the name of a publicly traded company to its ticker. The go
 
 <h3>Installation</h3>
 
-pip installation is TK
+pip installation is TK. For now, download zip file and run locally.
 
 <h3>Usage</h3>
 
