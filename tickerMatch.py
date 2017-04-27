@@ -7,7 +7,7 @@ import collections
 import csv
 import os.path
 import distance
-
+import re
 
 # a dictionary for adding known abbreviations for big companies that are frequently used
 known_abbrevs = {"fannie mae":"FNMA","ibm":"IBM","freddie mac":"FMCC","ups":"UPS","aig":"AIG","adp":"ADP"}
@@ -27,7 +27,6 @@ def ticker_match(search_file = None, lookup_file = None):
 	search_list = find_fuzzy_matches(search_list, lookup_dictionary)
 	output_file(search_list)
 
-
 ######LOAD/OUTPUT FUNCTIONS######
 #look for file, return the reader object
 def load_file(file_name):
@@ -36,12 +35,12 @@ def load_file(file_name):
 		reader = csv.reader(f)
 		return reader
 	else: 
-		print "File not found."
+		print("File not found.")
 		exit()
 
 #output file from search list
 def output_file(search_list): 
-	f = open("tickerMatchResults.csv","wb")
+	f = open("tickerMatchResults.csv","w")
 	writer = csv.writer(f)
 	writer.writerows(search_list)
 	f.close()
@@ -114,9 +113,9 @@ def name_cleaner(unclean_company):
 	#convert to lower
 	clean_company = unclean_company.lower()
 	#remove all punctuation 
-	clean_company = clean_company.translate(None, string.punctuation)
+	clean_company = re.sub('['+string.punctuation+']', '', clean_company)
 	#transliterate any unicode to ascii
-	''.join(x for x in unicodedata.normalize('NFKD', unicode(clean_company)) if x in string.ascii_letters).lower()
+	''.join(x for x in unicodedata.normalize('NFKD', str(clean_company)) if x in string.ascii_letters).lower()
 	#remove these common words from company names (also removes extra spaces)
 	clean_company = [' '.join(w for w in clean_company.split() if w not in delete_words)]
 	return clean_company[0]
@@ -124,7 +123,6 @@ def name_cleaner(unclean_company):
 #simple tokenize
 def tokenize_name(name):
 	return name.split()
-
 
 ######MATCHING FUNCTIONS######
 # find companies with exact matches and add to search list
@@ -167,7 +165,6 @@ def find_fuzzy_matches(search_list, lookup_dictionary):
 				search_item.append(lookup_dictionary[final_key][1])
 				search_item.append("guess")
 	return search_list
-
 
 # call main function 
 if __name__=="__main__":
